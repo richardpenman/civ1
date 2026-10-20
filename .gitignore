@@ -1,0 +1,17 @@
+# The original game (proprietary): its files and anything derived from them
+/orig/
+/build/
+/tests/scenarios/
+/save/
+src/rules_data.c
+src/fresh_save.c
+src/sdl/sound_data.c
+
+# Build output
+*.o
+/civ
+/civdump
+/shot
+/libciv.so
+/.toolchain/
+__pycache__/

@@ -1,0 +1,194 @@
+# Symbol names for tools/disasm.py.  f_SSSS_OOOO / o_NN_OOOO = function, g_XXXX = DGROUP global.
+
+# --- map (seg 1b05) ---
+f_1b05_1318 map_in_bounds            # (x, y) -> 0 <= x < 80 && 0 <= y < 50
+f_1b05_133c map_terrain              # (x, y) -> terrain type via colour lookup g_2b56
+f_1b05_135b map_unit_layer_owner     # (x, y) -> pixel(x+160, y) & 7
+f_1b05_144a unit_at                  # (x, y) -> unit index of owner map_unit_owner, or -1 (sets g_e70e)
+f_1b05_174c city_at                  # (x, y) -> city id or -1
+f_1b05_14d2 map_unit_owner           # (x, y) -> civ with units on square, or -1
+f_1b05_1645 map_set_improvements     # (bits, x, y); redraws if the human can see it
+f_1b05_16e0 map_clear_improvements   # (bits, x, y)
+f_1b05_1577 map_improvements         # (x, y) -> IMP_* bits from (x,y+100)|(x,y+150)<<4
+f_1b05_15b3 map_known_improvements   # (x, y) -> improvements as last seen by the human player
+f_1b05_17c1 map_put_pixel            # (x, y, value, page)
+f_1b05_180b sign                     # (v) -> -1 / 0 / 1
+f_1b05_1828 has_special_resource     # (x, y) -> derived from g_6e00 seed
+f_1b05_1886 has_hut                  # (terrain, x, y) -> seed-derived, cleared by g_7ff8 bit 0 or a city
+f_1b05_1918 map_layer_80_50          # (x, y) -> pixel(x+80, y+50)
+f_1b05_192f map_continent            # (x, y) -> pixel(x, y+50)
+f_0860_25b9 gfx_get_pixel            # (page, x, y)
+
+# --- save/load (overlay 11) ---
+o_11_09e4 save_serialize             # read or write every saved global, direction g_679c
+o_11_0ed2 save_block_far             # (off, seg, size)
+o_11_0f65 save_block                 # (near ptr, size)
+
+# --- globals ---
+g_90f2 game_turn
+g_e710 human_civ
+g_7eb6 human_mask
+g_6e00 world_seed
+g_c140 game_year
+g_6b06 difficulty
+g_6b0a civs_alive
+g_706c cities                        # [128] x 28 bytes
+g_7070 city_x
+g_7071 city_y
+g_7072 city_status
+g_90f4 units                         # [8][128] x 12 bytes
+g_90f5 unit_x
+g_90f6 unit_y
+g_90f7 unit_type
+g_90fe unit_next_in_stack
+g_112a unit_types                    # [28] x 34 bytes, saved with the game
+g_2b56 terrain_by_colour
+g_679c save_is_loading
+g_67a0 save_fd
+g_7ff8 map_visibility                # [80][50]; bit c = known to civ c; bit 0 = hut taken
+
+# --- main / turn loop ---
+f_01a7_000a main
+f_01a7_087e game_setup
+f_0237_0094 game_turn_loop           # one full turn: every civ, then year advance
+f_0237_0020 show_message             # (text, x, y)
+f_0237_000a show_message2            # (text, x, y)
+f_1f65_0455 load_text_section        # ("*KEY") -> text in g_c926
+f_0ad5_0008 civ_process_cities       # (civ) + AI tax/science rates
+f_0ad5_2293 civ_has_advance          # (civ, advance)
+f_0d07_0043 city_process             # (city, mode, ...) giant city routine incl. city screen
+f_0402_000a civ_move_units           # (civ) unit phase, human input or AI
+f_14f6_000c ai_diplomacy             # (civ)
+f_15da_000c ai_strategy              # (civ)
+f_15da_3452 ai_strategy2             # (civ)
+
+# --- utilities (seg 1dde) ---
+f_1dde_0040 randomize_seed
+f_1dde_005b rnd                      # (n) -> 0..n-1
+f_1dde_007a clamp                    # (v, lo, hi)
+f_1dde_00b8 city_at2
+f_1dde_0100 nearest_city             # (x, y) -> city, distance in g_6c1a
+f_1dde_0175 nearest_unit             # (civ, exclude, x, y)
+f_1dde_0206 distance                 # (dx, dy)
+f_1dde_0241 map_distance2            # (dx, dy)
+f_1dde_0287 map_distance             # (x1, x2, y1, y2)
+f_1dde_02cb civ_population           # (civ)
+
+# --- C runtime (seg 2058) ---
+f_2058_2adc srand
+f_2058_2aee rand
+f_2058_2ac6 abs
+f_2058_1e66 strcpy
+f_2058_1e26 strcat
+f_2058_1f6e itoa                     # (value, buf, radix)
+f_2058_17e6 open
+f_2058_174c close
+f_2058_176c lseek
+f_2058_198a read
+f_2058_25cc movedata
+f_2058_31e2 _lmul
+f_2058_32c4 _lshr
+
+# --- globals ---
+g_c0f6 treasury
+g_6d6e research_progress
+g_c2de units_active
+g_e228 units_in_production
+g_f7b8 advances_known
+g_f2e8 advances
+g_ee1c government
+g_6ae6 city_count
+g_6af6 unit_count
+g_f08a land_count
+g_7fe8 settler_count
+g_e218 citizen_count
+g_6e02 military_power
+g_7fbc civ_rank
+g_ee2e tax_rate
+g_c130 science_rate
+g_ed1e score
+g_ec0c researching
+g_e714 civ_type_of_player
+g_f5b8 unk_f5b8
+g_f3b8 diplomacy
+g_eb68 quit_flag
+g_64ca cur_civ                       # owner of the city being processed
+g_64c4 city_radius_squares           # 21 normally
+g_2498 city_square_dx                # [21+]
+g_24c2 city_square_dy
+f_2058_32b8 _lshl
+
+# --- units (seg 0860, 1a19, 1b05) ---
+f_1a19_0b66 unit_link                # (civ, unit, top): add to top's circular stack
+f_1a19_0bc9 unit_unlink              # (civ, unit)
+f_1b05_13bd unit_place               # (civ, unit, x, y)
+f_1b05_1404 unit_remove_from_square  # (civ, unit, x, y)
+f_1b05_137e map_set_unit_layer_owner # (civ, x, y)
+f_1b05_15f3 map_refresh_known        # (x, y): human sees real improvements
+f_1e4a_1191 wrap_x
+f_0860_141b stack_foreach            # (civ, unit, far fn(civ, unit))
+f_0860_1350 stack_count_role         # (civ, unit, role)
+f_0860_1379 cb_count_role
+f_0860_1472 cb_wake
+f_0860_15e0 cb_delete_land
+f_0860_1613 cb_delete_nonland
+f_0860_1646 cb_delete_air
+f_0860_1891 enemy_adjacent           # (civ, x, y)
+f_0860_0cc7 create_unit              # (civ, type, x, y) -> unit or -1
+f_0860_0ee0 delete_unit              # (civ, unit)
+f_0860_01dc unit_reveal              # (x, y, civ, unit, long update_display)
+f_0860_00c6 city_pack_fortified      # (city)
+f_0860_24cf replay_log               # (kind, nargs, a, b, c, d)
+f_0ad5_0190 destroy_city             # (city, x, y)
+f_0d07_0008 city_square_index        # (dx, dy) -> 0..20 or -1
+f_0d07_6761 city_work_square         # (city, square, mode)
+f_0d07_68f0 tile_yield               # (x, y, kind)
+f_0d07_6acb civ_has_wonder           # (civ, wonder)
+f_0d07_6b27 wonder_active_city       # (wonder)
+f_0d07_6b67 add_pollution            # (x, y)
+f_0d07_6ba2 nuclear_fallout          # (x, y)
+f_0d07_6c56 city_set_specialist      # (index, type)  city = g_64c2
+f_0d07_6c89 city_specialist          # (index)
+f_0d07_6cb4 city_count_specialists   # (type)
+f_0d07_6ce6 city_clamp_happiness     # (city, specialists)
+f_15da_34c8 ai_add_goal              # (civ, x, y, type, priority)
+f_15da_364f ai_shift_goals           # (civ, from)
+f_15da_369e ai_clear_continent_goals # (civ)
+f_15da_38d4 ai_rechoose_production   # (civ, continent or -1)
+f_15da_3931 city_rechoose_production # (city)
+f_14f6_073f civ_contact              # (civ, other, x, y)
+f_14f6_0b25 ai_wants_war              # (civ, other) -> 1 if civ would go to war
+f_14f6_0cf7 exchange_advances        # (civ, other)
+f_14f6_0a38 diplomacy_set            # (civ, other, flag)
+f_14f6_0aa9 diplomacy_clear          # (civ, other, flag)
+f_14f6_0e0d ai_continent_power       # (civ, continent) g_8f9a
+f_14f6_0e24 ai_continent_defense     # (civ, continent) g_6c2c
+f_14f6_0e3b civ_nuclear_count        # (civ)
+
+g_e70e stack_owner                   # owner found by the last unit_at()
+g_6b10 cur_player                    # civ whose units are moving
+g_408c replay_len                    # index of the last byte written to the replay log
+g_6e28 wonder_city
+g_f2e4 rules_flags
+g_7058 count_losses
+g_20f4 quiet                         # suppress display updates
+
+# --- far data (segment 2786, 2618), saved with the game ---
+h_2786_0000 unk_far_0000             # 1200 bytes
+h_2786_04b0 first_discoverer         # [72] words: low 3 bits = civ that discovered it first
+h_2786_0540 unk_far_0540             # 256 bytes
+h_2786_0640 unk_far_0640             # 256 bytes
+h_2786_0740 unk_far_0740             # 1440 bytes
+h_2786_0da8 advance_source           # [8][72] bytes: who gave each advance
+h_2786_0fe8 unk_far_0fe8             # 1200 bytes
+h_2786_159c units_lost               # [8][28] words
+h_2786_175c replay                   # 4096 bytes
+h_2618_0000 city_names               # [256][13]
+f_1439_0940 caravan_arrive             # (civ, unit, city)
+o_05_07c2 civ_restart                # (civ)
+o_05_0e67 civ_check_destroyed        # (civ, by)
+f_0ad5_1569 research_complete        # (civ, from)
+f_0ad5_22f5 advance_value            # (civ, advance)
+g_19be human_research
+g_c15a future_tech_count
+f_0237_1b40 redraw_map
