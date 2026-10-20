@@ -3,17 +3,27 @@
 A C reconstruction of the DOS game's `CIV.EXE` (see `NOTES.md` for how it was recovered and
 verified), with an SDL2 front end that uses the original game files.
 
+| | |
+|---|---|
+| ![The map](docs/screenshots/map.png) | ![A city](docs/screenshots/city.png) |
+| The map | A city |
+| ![A city view](docs/screenshots/cityview.png) | ![A discovery](docs/screenshots/discovery.png) |
+| A city view | A discovery |
+| ![The Civilopedia](docs/screenshots/civilopedia.png) | ![A newspaper](docs/screenshots/newspaper.png) |
+| The Civilopedia | A newspaper and the new cabinet |
+| ![Top 5 cities](docs/screenshots/top5.png) | ![Civilization score](docs/screenshots/score.png) |
+| The Top 5 cities | The Civilization score |
+
 ## Build
 
-    make            # civ (the game), libciv.so + civdump (engine, tests), shot (screenshots)
+    make civ
 
 The original game is not part of this repository.  Put its files (`CIV.EXE`, `ISOUND.CVL`,
 the `*.PIC`, `*.PAL`, `*.TXT` files, `FONTS.CV`, ...) in `~/Dos/Civ1` (or point
-`$CIV_ORIG`, or `make ORIG=dir`, at them): the first `make` derives
-the rule tables, the initial game state and the sounds from them (`src/rules_data.c`,
-`src/fresh_save.c`, `src/sdl/sound_data.c`, with python3 and the `unicorn` module; also the
-disassembly in `build/asm/` that the emulator-based tools use), and the game reads its
-pictures, fonts and texts from there at run time.
+`$CIV_ORIG`, or `make ORIG=dir`, at them).  The game reads its pictures, fonts and texts from
+there.  The first build also extracts three data files from them once (the rule tables, the
+starting game state and the sounds: `src/rules_data.c`, `src/fresh_save.c`,
+`src/sdl/sound_data.c`); this needs python3 with the `unicorn` module.
 
 Needs a C99 compiler and SDL2 (the Makefile also uses a local `.toolchain/` if present).
 On macOS: `xcode-select --install` and `brew install sdl2`, then `make civ` (SDL2 is found
