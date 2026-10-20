@@ -43,19 +43,29 @@ civ: $(filter-out src/ui_headless.o,$(CORE)) $(GUI) src/sdl/ui_sdl.o src/sdl/mai
 src/sdl/%.o: src/sdl/%.c $(wildcard src/*.h src/sdl/*.h)
 	$(CC) $(CFLAGS) $(SDLCFLAGS) -c -o $@ $<
 
-# Data generated from the original game's files (not kept in the repository).
-src/rules_data.c: tools/extract_rules.py $(ORIG)/CIV.EXE
+# Data generated from the original game's files (not kept in the repository).  Without them
+# (no $(ORIG)/CIV.EXE) `make stub-data` puts empty stand-ins in their place: that builds,
+# but does not play (the compile check, .github/workflows/build.yml).
+EXE     := $(wildcard $(ORIG)/CIV.EXE)
+SND     := $(wildcard $(ORIG)/ISOUND.CVL)
+
+src/rules_data.c: tools/extract_rules.py $(EXE)
 	python3 -I tools/extract_rules.py $(ORIG)/CIV.EXE $@
 
-src/fresh_save.c: tools/extract_fresh.py $(ORIG)/CIV.EXE build/asm/symbols.txt
+src/fresh_save.c: tools/extract_fresh.py $(EXE) $(if $(EXE),build/asm/symbols.txt)
 	python3 -I tools/extract_fresh.py $@
 
 # The disassembly (build/asm/*.asm, symbols.txt): the emulator-based tools and tests need it.
-build/asm/symbols.txt: tools/disasm.py tools/symbols.map $(ORIG)/CIV.EXE
+build/asm/symbols.txt: tools/disasm.py tools/symbols.map $(EXE)
 	python3 -I tools/disasm.py $(ORIG)/CIV.EXE build/asm
 
-src/sdl/sound_data.c: tools/extract_sound.py $(ORIG)/ISOUND.CVL
+src/sdl/sound_data.c: tools/extract_sound.py $(SND)
 	python3 -I tools/extract_sound.py $(ORIG)/ISOUND.CVL $@
+
+stub-data:
+	cp ci/stubs/rules_data.c ci/stubs/fresh_save.c src/
+	cp ci/stubs/sdl/sound_data.c src/sdl/
+	touch src/rules_data.c src/fresh_save.c src/sdl/sound_data.c
 
 %.o: %.c $(wildcard src/*.h)
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -70,4 +80,4 @@ smoke: civ
 clean:
 	rm -f civdump libciv.so civ shot src/*.o src/tools/*.o src/sdl/*.o
 
-.PHONY: all test smoke clean
+.PHONY: all test smoke clean stub-data

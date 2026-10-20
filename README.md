@@ -44,3 +44,7 @@ GAME menu's Options).
     make test       # differential tests against the original EXE run in an emulator
                     # (needs python3 with unicorn)
     make smoke      # the SDL front end plays scripted games without a window
+
+GitHub runs only a compile check (`.github/workflows/build.yml`, Linux and macOS): without
+the original's files it builds with empty stand-ins for the derived data (`make stub-data`,
+`ci/stubs/`), which compiles but does not play.  Run the tests locally before pushing.

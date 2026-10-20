@@ -1,0 +1,32 @@
+# Compile check: the original game's files are not in the repository, so the data derived
+# from them is replaced by empty stand-ins (make stub-data).  This checks that the sources
+# build on Linux and macOS; the test suite needs the game and runs locally (make test).
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SDL2 (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
+      - name: Install SDL2 (macOS)
+        if: runner.os == 'macOS'
+        run: brew install sdl2
+      - name: Stand-in data
+        run: make stub-data
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: make all
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: make civ civdump
